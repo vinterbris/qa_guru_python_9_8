@@ -93,8 +93,10 @@ class TestCart:
             cart.add_product(item, 100)
         assert cart.clear() == {}
 
-    def test_get_total_price(self, cart):
-        pass
+    def test_get_total_price(self, list_of_products, cart):
+        for item in list_of_products:
+            cart.add_product(item, 100)
+        assert cart.get_total_price() == 11500
 
     def test_buy(self, cart):
-        pass
+        assert cart.buy()
