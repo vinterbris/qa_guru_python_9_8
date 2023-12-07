@@ -76,6 +76,10 @@ class TestCart:
         assert cart.remove_product(product, 1) == {product: 99}
         assert cart.remove_product(product, 98) == {product: 1}
         assert cart.remove_product(product, 1) == {}
+        cart.add_product(product, 100)
+        assert cart.remove_product(product, 500) == {}
+        cart.add_product(product, 100)
+        assert cart.remove_product(product) == {}
 
     def test_remove_product_multiple(self, list_of_products, cart):
         generate_cart_from_list(list_of_products, cart)
@@ -91,6 +95,8 @@ class TestCart:
                 cart.remove_product(list_of_products[1], 1) ==
                 {list_of_products[0]: 100, list_of_products[2]: 100}
         )
+        assert cart.remove_product(list_of_products[0]) == {list_of_products[2]: 100}
+        assert cart.remove_product(list_of_products[2], 300) == {}
 
     def test_clear(self, list_of_products, cart):
         generate_cart_from_list(list_of_products, cart)
@@ -102,7 +108,10 @@ class TestCart:
 
     def test_buy(self, list_of_products, cart):
         generate_cart_from_list(list_of_products, cart)
-        assert cart.buy() == 'Success'
+        assert cart.buy() == {}
+        assert list_of_products[0].quantity == 900
+        assert list_of_products[1].quantity == 9900
+        assert list_of_products[2].quantity == 49900
 
     def test_cart_buy_more_than_available(self, list_of_products, cart):
         generate_cart_from_list(list_of_products, cart)

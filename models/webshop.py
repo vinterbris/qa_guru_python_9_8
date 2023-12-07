@@ -68,9 +68,12 @@ class Cart:
         Если remove_count больше, чем количество продуктов в позиции, то удаляется вся позиция
         """
         if product in self.products:
-            self.products[product] -= remove_count
-            if self.products[product] == 0:
+            if remove_count is None:
                 self.products.pop(product)
+            else:
+                self.products[product] -= remove_count
+                if self.products[product] <= 0:
+                    self.products.pop(product)
         return self.products
 
     def clear(self):
@@ -93,7 +96,7 @@ class Cart:
         """
         for product in self.products:
             if product.check_quantity(self.products[product]):
-                pass
+                product.quantity -= self.products[product]
             else:
                 raise ValueError
-        return 'Success'
+        return self.clear()
