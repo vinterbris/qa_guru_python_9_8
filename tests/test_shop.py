@@ -3,12 +3,25 @@
 """
 import pytest
 
-from models.webshop import Product
+from models.webshop import Product, Cart
 
 
 @pytest.fixture
 def product():
     return Product("book", 100, "This is a book", 1000)
+
+
+@pytest.fixture
+def list_of_products():
+    book = Product("book", 100, "This is a book", 1000)
+    fork = Product("fork", 5, "This is a fork", 10000)
+    spoon = Product("spoon", 10, "This is a fork", 50000)
+    return [book, fork, spoon]
+
+
+@pytest.fixture()
+def cart():
+    return Cart()
 
 
 class TestProducts:
@@ -42,3 +55,46 @@ class TestCart:
         На некоторые методы у вас может быть несколько тестов.
         Например, негативные тесты, ожидающие ошибку (используйте pytest.raises, чтобы проверить это)
     """
+
+    def test_add_product(self, product, cart):
+        assert cart.add_product(product, 1) == {product: 1}
+        assert cart.add_product(product, 1) == {product: 2}
+        assert cart.add_product(product, 100) == {product: 102}
+
+    def test_add_product_multiple(self, list_of_products, cart):
+        for item in list_of_products:
+            cart.add_product(item)
+        assert cart.products == {list_of_products[0]: 1, list_of_products[1]: 1, list_of_products[2]: 1}
+
+    def test_remove_product(self, product, cart):
+        cart.add_product(product, 100)
+        assert cart.remove_product(product, 1) == {product: 99}
+        assert cart.remove_product(product, 98) == {product: 1}
+        assert cart.remove_product(product, 1) == {}
+
+    def test_remove_product_multiple(self, list_of_products, cart):
+        for item in list_of_products:
+            cart.add_product(item, 100)
+        assert (
+                cart.remove_product(list_of_products[1], 1) ==
+                {list_of_products[0]: 100, list_of_products[1]: 99, list_of_products[2]: 100}
+        )
+        assert (
+                cart.remove_product(list_of_products[1], 98) ==
+                {list_of_products[0]: 100, list_of_products[1]: 1, list_of_products[2]: 100}
+        )
+        assert (
+                cart.remove_product(list_of_products[1], 1) ==
+                {list_of_products[0]: 100, list_of_products[2]: 100}
+        )
+
+    def test_clear(self, list_of_products, cart):
+        for item in list_of_products:
+            cart.add_product(item, 100)
+        assert cart.clear() == {}
+
+    def test_get_total_price(self, cart):
+        pass
+
+    def test_buy(self, cart):
+        pass

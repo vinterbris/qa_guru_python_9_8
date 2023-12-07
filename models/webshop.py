@@ -36,6 +36,7 @@ class Product:
         return hash(self.name + self.description)
 
 
+@dataclass
 class Cart:
     """
     Класс корзины. В нем хранятся продукты, которые пользователь хочет купить.
@@ -54,7 +55,11 @@ class Cart:
         Метод добавления продукта в корзину.
         Если продукт уже есть в корзине, то увеличиваем количество
         """
-        raise NotImplementedError
+        if product in self.products:
+            self.products[product] += buy_count
+        else:
+            self.products[product] = buy_count
+        return self.products
 
     def remove_product(self, product: Product, remove_count=None):
         """
@@ -62,10 +67,15 @@ class Cart:
         Если remove_count не передан, то удаляется вся позиция
         Если remove_count больше, чем количество продуктов в позиции, то удаляется вся позиция
         """
-        raise NotImplementedError
+        if product in self.products:
+            self.products[product] -= remove_count
+            if self.products[product] == 0:
+                self.products.pop(product)
+        return self.products
 
     def clear(self):
-        raise NotImplementedError
+        self.products.clear()
+        return self.products
 
     def get_total_price(self) -> float:
         raise NotImplementedError
