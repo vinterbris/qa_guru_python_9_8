@@ -15,7 +15,7 @@ def product():
 def list_of_products():
     book = Product("book", 100, "This is a book", 1000)
     fork = Product("fork", 5, "This is a fork", 10000)
-    spoon = Product("spoon", 10, "This is a fork", 50000)
+    spoon = Product("spoon", 10, "This is a spoon", 50000)
     return [book, fork, spoon]
 
 
@@ -48,6 +48,12 @@ class TestProducts:
             product.buy(1001)
 
 
+def generate_cart_from_list(list_of_products, cart):
+    for item in list_of_products:
+        cart.add_product(item, 100)
+    return cart
+
+
 class TestCart:
     """
     TODO Напишите тесты на методы класса Cart
@@ -62,9 +68,8 @@ class TestCart:
         assert cart.add_product(product, 100) == {product: 102}
 
     def test_add_product_multiple(self, list_of_products, cart):
-        for item in list_of_products:
-            cart.add_product(item)
-        assert cart.products == {list_of_products[0]: 1, list_of_products[1]: 1, list_of_products[2]: 1}
+        generate_cart_from_list(list_of_products, cart)
+        assert cart.products == {list_of_products[0]: 100, list_of_products[1]: 100, list_of_products[2]: 100}
 
     def test_remove_product(self, product, cart):
         cart.add_product(product, 100)
@@ -73,8 +78,7 @@ class TestCart:
         assert cart.remove_product(product, 1) == {}
 
     def test_remove_product_multiple(self, list_of_products, cart):
-        for item in list_of_products:
-            cart.add_product(item, 100)
+        generate_cart_from_list(list_of_products, cart)
         assert (
                 cart.remove_product(list_of_products[1], 1) ==
                 {list_of_products[0]: 100, list_of_products[1]: 99, list_of_products[2]: 100}
@@ -89,14 +93,19 @@ class TestCart:
         )
 
     def test_clear(self, list_of_products, cart):
-        for item in list_of_products:
-            cart.add_product(item, 100)
+        generate_cart_from_list(list_of_products, cart)
         assert cart.clear() == {}
 
     def test_get_total_price(self, list_of_products, cart):
-        for item in list_of_products:
-            cart.add_product(item, 100)
+        generate_cart_from_list(list_of_products, cart)
         assert cart.get_total_price() == 11500
 
-    def test_buy(self, cart):
-        assert cart.buy()
+    def test_buy(self, list_of_products, cart):
+        generate_cart_from_list(list_of_products, cart)
+        assert cart.buy() == 'Success'
+
+    def test_cart_buy_more_than_available(self, list_of_products, cart):
+        generate_cart_from_list(list_of_products, cart)
+        cart.add_product(list_of_products[2], 49901)
+        with pytest.raises(ValueError):
+            cart.buy()
